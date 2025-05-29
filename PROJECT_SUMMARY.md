@@ -41,11 +41,21 @@ Successfully created a comprehensive C# solution that demonstrates, improves, an
 - ✅ **Mock-based Testing**: Using Moq for isolated testing
 
 ### 📊 **Demo Results**
-The solution successfully processes **2.90 MB** of test data into **2 ZIP archives**:
+The solution provides **two comprehensive demo modes**:
+
+#### **Quick Demo** (Option 1)
+- Processes **2.90 MB** of test data into **2 ZIP archives**
 - `archive001.zip` - 6.63 KB (contains large files)
 - `archive002.zip` - 3.56 KB (contains remaining files)
+- **Performance**: Completes in ~0.04 seconds with basic progress reporting
 
-**Performance**: Completes in ~0.06 seconds with real-time progress reporting.
+#### **Enhanced Progress Demo** (Option 2) ⭐
+- Processes **15.0 MB** of realistic demo files into **5 ZIP archives**
+- Creates diverse file types: database.db (2.9MB), photos (2.1-2.2MB each), PDFs, source code, etc.
+- **Visual Progress Bar**: 50-character display (`█░░░░░░░░░░░░░░░░░░░`) 
+- **Real-time Updates**: Shows percentage, current archive, bytes processed, current file
+- **Performance**: Completes in ~0.68 seconds with stunning visual feedback
+- **Progress Scope**: 0-100% represents the **entire operation** across all archives
 
 ## 🔧 **Technical Specifications**
 

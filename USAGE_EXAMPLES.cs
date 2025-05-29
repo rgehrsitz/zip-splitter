@@ -8,6 +8,9 @@ namespace ZipSplitter.Examples
 {
     /// <summary>
     /// Examples demonstrating various ways to use the ZipSplitter library.
+    /// For a live demonstration, run the console application which offers:
+    /// - Quick Demo: Fast demonstration with 2.9MB sample files
+    /// - Enhanced Progress Demo: Visual progress bar with 15MB realistic files
     /// </summary>
     public class UsageExamples
     {
@@ -111,8 +114,67 @@ namespace ZipSplitter.Examples
         }
 
         /// <summary>
-        /// Advanced usage with custom progress tracking
+        /// Enhanced visual progress example (similar to the Enhanced Demo)
         /// </summary>
+        public static async Task VisualProgressExample()
+        {
+            Console.WriteLine("=== Visual Progress Example ===");
+
+            var progress = new Progress<ProgressInfo>(info =>
+            {
+                // Create a visual progress bar (50 characters wide)
+                int barLength = 50;
+                int filledLength = (int)(info.PercentageComplete / 100.0 * barLength);
+                string progressBar =
+                    new string('█', filledLength) + new string('░', barLength - filledLength);
+
+                // Clear the line and write the progress
+                Console.Write($"\r[{progressBar}] {info.PercentageComplete:F1}%");
+                Console.Write(
+                    $"\nArchive: {info.CurrentArchiveIndex} | Processed: {FormatBytes(info.BytesProcessed)}"
+                );
+                if (!string.IsNullOrEmpty(info.CurrentOperation))
+                {
+                    Console.Write($"\nCurrent: {info.CurrentOperation}");
+                }
+
+                // Move cursor back up to overwrite on next update
+                Console.SetCursorPosition(0, Console.CursorTop - 2);
+            });
+
+            try
+            {
+                await ZipSplitterWithProgress.CreateSplitArchivesWithProgressAsync(
+                    sourceDirectory: @"C:\LargeProject",
+                    destinationDirectory: @"C:\VisualBackup",
+                    maxArchiveSizeBytes: 100 * 1024 * 1024, // 100MB
+                    progress: progress
+                );
+
+                Console.WriteLine("\n\n=== Visual Progress Complete ===");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\n\nError: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Helper method to format bytes in a human-readable way
+        /// </summary>
+        private static string FormatBytes(long bytes)
+        {
+            string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
+            int counter = 0;
+            decimal number = bytes;
+            while (Math.Round(number / 1024) >= 1)
+            {
+                number /= 1024;
+                counter++;
+            }
+            return $"{number:n1} {suffixes[counter]}";
+        }
+
         public static async Task AdvancedProgressExample()
         {
             Console.WriteLine("=== Advanced Progress Example ===");

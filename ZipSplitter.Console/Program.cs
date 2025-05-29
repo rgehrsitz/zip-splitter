@@ -24,8 +24,12 @@ namespace ZipSplitter.Console
                 await RunInteractiveDemo();
             }
 
-            System.Console.WriteLine("\nPress any key to exit...");
-            System.Console.ReadKey();
+            // Only prompt for key press if console input is available
+            if (Environment.UserInteractive && !System.Console.IsInputRedirected)
+            {
+                System.Console.WriteLine("\nPress any key to exit...");
+                System.Console.ReadKey();
+            }
         }
 
         private static async Task RunWithArguments(string[] args)
@@ -55,6 +59,22 @@ namespace ZipSplitter.Console
 
         private static async Task RunInteractiveDemo()
         {
+            System.Console.WriteLine("=== ZIP Splitter Demo ===");
+            System.Console.WriteLine("Choose demo mode:");
+            System.Console.WriteLine("1. Quick demo (small files, fast)");
+            System.Console.WriteLine(
+                "2. Enhanced progress demo (larger files, visual progress bar)"
+            );
+            System.Console.Write("Enter choice (1 or 2): ");
+
+            var choice = System.Console.ReadLine();
+
+            if (choice == "2")
+            {
+                await EnhancedProgressDemo.RunDemo();
+                return;
+            }
+
             try
             {
                 // Create a demo directory structure for testing

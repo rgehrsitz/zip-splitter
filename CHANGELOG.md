@@ -2,6 +2,40 @@
 
 All notable changes and improvements to the ZIP Splitter project are documented in this file.
 
+## [2.1.0] - 2025-05-29
+
+### Added
+- ✅ **Enhanced Progress Demo**: New visual progress demonstration with 15MB of realistic files
+- ✅ **Visual Progress Bar**: 50-character progress bar display (`█░░░░░░░░░░░░░░░░░░░`)
+- ✅ **Demo Mode Selection**: Console app now offers Quick Demo vs Enhanced Progress Demo
+- ✅ **Input Redirection Support**: Fixed Console.ReadKey() issues for automated runs
+- ✅ **Realistic Demo Files**: Database, photos, PDFs, source code, and documentation files
+
+### Improved
+- **Progress Visualization**: Enhanced demo showcases progress reporting capabilities
+- **Demo Experience**: Two distinct demo modes for different use cases
+- **Cross-Platform Compatibility**: Better handling of console input in various environments
+- **Documentation**: Updated to reflect enhanced demo features and progress reporting scope
+
+## [2.1.0] - 2025-05-29
+
+### Added
+- ✅ **Enhanced Progress Demo**: New comprehensive demo mode with visual progress bar
+- ✅ **Visual Progress Bar**: 50-character progress display (`█░░░░░░░░░░░░░░░░░░░`)
+- ✅ **Realistic Demo Files**: 15MB of diverse file types (database, photos, documents, source code)
+- ✅ **Dual Demo Modes**: Quick demo (2.9MB, ~0.04s) and Enhanced demo (15MB, ~0.68s)
+- ✅ **Input Redirection Support**: Console apps work with piped input (e.g., `echo "2" | dotnet run`)
+
+### Improved
+- **Progress Reporting Scope**: Clarified that progress represents entire operation (0-100% across all archives)
+- **Console Experience**: Enhanced visual feedback with real-time archive index and current file display
+- **Demo Variety**: Realistic file types including database.db, photo1.jpg, manual.pdf, source.zip, etc.
+- **Cross-Platform Input**: Proper handling of input redirection for automated scenarios
+
+### Fixed
+- **Console.ReadKey() Exception**: Fixed crashes when input is redirected by checking `Environment.UserInteractive` and `Console.IsInputRedirected`
+- **Demo Reliability**: Both demo modes now work flawlessly in various execution environments
+
 ## [2.0.0] - 2025-05-29
 
 ### Added

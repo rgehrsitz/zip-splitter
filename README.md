@@ -61,7 +61,14 @@ Run the console application in two ways:
 ```bash
 dotnet run --project ZipSplitter.Console
 ```
-This creates sample files and demonstrates the splitting functionality.
+This provides two demo options:
+- **Quick Demo**: Fast demonstration with 2.9MB of sample files, completes in ~0.04 seconds
+- **Enhanced Progress Demo**: Comprehensive showcase with 15MB of realistic files featuring:
+  - Visual progress bar with 50-character display (`█░░░░░░░░░░░░░░░░░░░`)
+  - Real-time percentage completion for entire operation (0-100%)
+  - Current archive index and bytes processed
+  - Current file being processed
+  - Processes across 5 archives in ~0.68 seconds
 
 #### Command Line Mode
 ```bash
@@ -151,10 +158,12 @@ dotnet run --project ZipSplitter.Console
 
 ### Progress Reporting
 The `ProgressInfo` class provides detailed information:
-- `PercentageComplete`: Overall completion percentage (0-100)
+- `PercentageComplete`: Overall completion percentage (0-100) for the **entire operation** across all archives
 - `CurrentArchiveIndex`: Which archive is currently being created
-- `BytesProcessed`: Total bytes processed so far
+- `BytesProcessed`: Total bytes processed so far across all archives
 - `CurrentOperation`: Description of current operation
+
+**Note**: Progress percentage represents the entire job completion, not per-archive progress. The enhanced demo showcases this with a visual progress bar that fills from 0% to 100% as it processes multiple archives.
 
 ### Error Handling
 - **ArgumentException**: Invalid input parameters
