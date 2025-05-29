@@ -18,28 +18,40 @@ namespace ZipSplitter.Core
         /// <param name="sourceDirectory">The source directory to compress</param>
         /// <param name="destinationDirectory">The destination directory for ZIP files</param>
         /// <param name="maxArchiveSizeBytes">Maximum size per archive in bytes</param>
-        /// <param name="progress">Progress reporter for completion percentage</param>
+        /// <param name="progress">Progress reporter for completion percentage. Reports progress every 80KB chunk during file compression for smooth progress updates.</param>
         /// <param name="cancellationToken">Cancellation token to stop the operation</param>
         /// <returns>A task representing the asynchronous operation</returns>
         /// <exception cref="ArgumentException">Thrown when source directory doesn't exist</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when maxArchiveSizeBytes is too small</exception>
         /// <exception cref="OperationCanceledException">Thrown when operation is cancelled</exception>
+        /// <remarks>
+        /// Progress reporting occurs every 80KB chunk during file compression, providing smooth progress updates
+        /// even for large files. For example, a 15MB file will generate approximately 192 progress updates.
+        /// This ensures responsive user feedback during long-running compression operations.
+        /// </remarks>
         public static async Task CreateSplitArchivesWithProgressAsync(
             string sourceDirectory,
             string destinationDirectory,
             long maxArchiveSizeBytes,
-            IProgress<ProgressInfo> progress = null,
-            CancellationToken cancellationToken = default)
+            IProgress<ProgressInfo>? progress = null,
+            CancellationToken cancellationToken = default
+        )
         {
             // Validate inputs
             if (!Directory.Exists(sourceDirectory))
             {
-                throw new ArgumentException($"Source directory does not exist: {sourceDirectory}", nameof(sourceDirectory));
+                throw new ArgumentException(
+                    $"Source directory does not exist: {sourceDirectory}",
+                    nameof(sourceDirectory)
+                );
             }
 
             if (maxArchiveSizeBytes < 1024 * 1024) // Minimum 1MB
             {
-                throw new ArgumentOutOfRangeException(nameof(maxArchiveSizeBytes), "Maximum archive size must be at least 1MB");
+                throw new ArgumentOutOfRangeException(
+                    nameof(maxArchiveSizeBytes),
+                    "Maximum archive size must be at least 1MB"
+                );
             }
 
             // Create destination directory if it doesn't exist
@@ -56,13 +68,15 @@ namespace ZipSplitter.Core
             foreach (var file in allFiles)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 var fileInfo = new FileInfo(file);
                 if (fileInfo.Length > maxArchiveSizeBytes)
                 {
-                    throw new InvalidOperationException($"File {file} ({fileInfo.Length} bytes) exceeds maximum archive size ({maxArchiveSizeBytes} bytes)");
+                    throw new InvalidOperationException(
+                        $"File {file} ({fileInfo.Length} bytes) exceeds maximum archive size ({maxArchiveSizeBytes} bytes)"
+                    );
                 }
-                
+
                 fileInfos.Add(fileInfo);
                 totalBytes += fileInfo.Length;
             }
@@ -77,7 +91,7 @@ namespace ZipSplitter.Core
             int archiveIndex = 1;
             long currentArchiveSize = 0;
             string currentArchivePath = GetArchivePath(destinationDirectory, archiveIndex);
-            ZipArchive currentArchive = null;
+            ZipArchive? currentArchive = null;
 
             try
             {
@@ -90,7 +104,10 @@ namespace ZipSplitter.Core
                     long fileSize = fileInfo.Length;
 
                     // Check if we need to create a new archive
-                    if (currentArchiveSize + fileSize > maxArchiveSizeBytes && currentArchiveSize > 0)
+                    if (
+                        currentArchiveSize + fileSize > maxArchiveSizeBytes
+                        && currentArchiveSize > 0
+                    )
                     {
                         currentArchive?.Dispose();
                         archiveIndex++;
@@ -100,29 +117,58 @@ namespace ZipSplitter.Core
                     }
 
                     string entryName = Path.GetRelativePath(sourceDirectory, fileInfo.FullName);
-                    
+
                     try
                     {
-                        using (var sourceStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (
+                            var sourceStream = new FileStream(
+                                fileInfo.FullName,
+                                FileMode.Open,
+                                FileAccess.Read,
+                                FileShare.Read
+                            )
+                        )
                         {
-                            var entry = currentArchive.CreateEntry(entryName, CompressionLevel.Optimal);
+                            var entry = currentArchive.CreateEntry(
+                                entryName,
+                                CompressionLevel.Optimal
+                            );
                             using (var entryStream = entry.Open())
                             {
+                                // 80KB buffer for streaming file data
+                                // Progress is reported after each buffer read/write operation
+                                // This provides smooth progress updates for large files
                                 var buffer = new byte[81920]; // 80 KB buffer
                                 int bytesRead;
-                                while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                                while (
+                                    (
+                                        bytesRead = await sourceStream.ReadAsync(
+                                            buffer,
+                                            0,
+                                            buffer.Length,
+                                            cancellationToken
+                                        )
+                                    ) > 0
+                                )
                                 {
-                                    await entryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+                                    await entryStream.WriteAsync(
+                                        buffer,
+                                        0,
+                                        bytesRead,
+                                        cancellationToken
+                                    );
                                     bytesProcessed += bytesRead;
                                     currentArchiveSize += bytesRead;
-                                    
-                                    var progressPercentage = (double)bytesProcessed / totalBytes * 100;
+
+                                    var progressPercentage =
+                                        (double)bytesProcessed / totalBytes * 100;
                                     var progressInfo = new ProgressInfo(
-                                        progressPercentage, 
-                                        archiveIndex, 
-                                        bytesProcessed, 
-                                        $"Processing: {entryName}");
-                                    
+                                        progressPercentage,
+                                        archiveIndex,
+                                        bytesProcessed,
+                                        $"Processing: {entryName}"
+                                    );
+
                                     progress?.Report(progressInfo);
                                 }
                             }
@@ -130,15 +176,23 @@ namespace ZipSplitter.Core
                     }
                     catch (UnauthorizedAccessException ex)
                     {
-                        throw new InvalidOperationException($"Access denied to file: {fileInfo.FullName}", ex);
+                        throw new InvalidOperationException(
+                            $"Access denied to file: {fileInfo.FullName}",
+                            ex
+                        );
                     }
                     catch (IOException ex)
                     {
-                        throw new InvalidOperationException($"I/O error processing file: {fileInfo.FullName}", ex);
+                        throw new InvalidOperationException(
+                            $"I/O error processing file: {fileInfo.FullName}",
+                            ex
+                        );
                     }
                 }
 
-                progress?.Report(new ProgressInfo(100, archiveIndex, bytesProcessed, "Compression completed"));
+                progress?.Report(
+                    new ProgressInfo(100, archiveIndex, bytesProcessed, "Compression completed")
+                );
             }
             finally
             {
@@ -148,23 +202,37 @@ namespace ZipSplitter.Core
 
         /// <summary>
         /// Synchronous version of CreateSplitArchivesWithProgressAsync for compatibility.
+        /// Progress reporting occurs every 80KB chunk during file compression for smooth updates.
         /// </summary>
+        /// <param name="sourceDirectory">The source directory to compress</param>
+        /// <param name="destinationDirectory">The destination directory for ZIP files</param>
+        /// <param name="maxArchiveSizeBytes">Maximum size per archive in bytes</param>
+        /// <param name="progress">Progress reporter for completion percentage (0-100)</param>
+        /// <remarks>
+        /// This method uses an 80KB buffer for file processing, reporting progress after each chunk.
+        /// Large files will generate multiple progress updates for smooth user feedback.
+        /// </remarks>
         public static void CreateSplitArchivesWithProgress(
             string sourceDirectory,
             string destinationDirectory,
             long maxArchiveSizeBytes,
-            IProgress<double> progress = null)
+            IProgress<double>? progress = null
+        )
         {
-            var wrappedProgress = progress != null 
-                ? new Progress<ProgressInfo>(info => progress.Report(info.PercentageComplete))
-                : null;
+            IProgress<ProgressInfo>? wrappedProgress =
+                progress != null
+                    ? new Progress<ProgressInfo>(info => progress.Report(info.PercentageComplete))
+                    : null;
 
             CreateSplitArchivesWithProgressAsync(
-                sourceDirectory, 
-                destinationDirectory, 
-                maxArchiveSizeBytes, 
-                wrappedProgress, 
-                CancellationToken.None).GetAwaiter().GetResult();
+                    sourceDirectory,
+                    destinationDirectory,
+                    maxArchiveSizeBytes,
+                    wrappedProgress,
+                    CancellationToken.None
+                )
+                .GetAwaiter()
+                .GetResult();
         }
 
         private static string GetArchivePath(string destinationDirectory, int index)
@@ -189,7 +257,12 @@ namespace ZipSplitter.Core
         public long BytesProcessed { get; }
         public string CurrentOperation { get; }
 
-        public ProgressInfo(double percentageComplete, int currentArchiveIndex, long bytesProcessed, string currentOperation)
+        public ProgressInfo(
+            double percentageComplete,
+            int currentArchiveIndex,
+            long bytesProcessed,
+            string currentOperation
+        )
         {
             PercentageComplete = percentageComplete;
             CurrentArchiveIndex = currentArchiveIndex;

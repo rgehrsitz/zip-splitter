@@ -15,7 +15,9 @@ namespace ZipSplitter.Examples
     public class UsageExamples
     {
         /// <summary>
-        /// Basic usage with progress reporting
+        /// Basic usage with progress reporting.
+        /// Progress updates occur every 80KB chunk during file compression,
+        /// providing smooth progress for large files.
         /// </summary>
         public static async Task BasicUsageExample()
         {
@@ -54,12 +56,14 @@ namespace ZipSplitter.Examples
 
             // Cancel after 10 seconds
             cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(10));
-
             var progress = new Progress<ProgressInfo>(info =>
             {
                 Console.WriteLine(
                     $"Archive {info.CurrentArchiveIndex}: {info.PercentageComplete:F1}% - {info.CurrentOperation}"
                 );
+                // Note: Progress updates occur every 80KB chunk during compression
+                // For a 15MB file, you'll see ~192 progress updates (15MB ÷ 80KB)
+                // This provides smooth progress feedback for large files
             });
 
             try
@@ -85,7 +89,8 @@ namespace ZipSplitter.Examples
         }
 
         /// <summary>
-        /// Synchronous usage for simple scenarios
+        /// Synchronous usage for simple scenarios.
+        /// Progress updates occur every 80KB chunk, providing smooth feedback.
         /// </summary>
         public static void SynchronousExample()
         {

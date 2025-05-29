@@ -37,6 +37,9 @@ Comprehensive test suite including:
 ### Core Functionality
 - ✅ **Async/Await Support**: Efficient handling of I/O operations
 - ✅ **Progress Reporting**: Detailed progress information via `IProgress<ProgressInfo>`
+  - **Granular Updates**: Progress updates occur every 80KB chunk during file compression
+  - **Smooth Progress**: For large files, you'll see continuous progress updates rather than waiting for complete files
+  - **Real-time Feedback**: Approximately 192 progress updates for a 15MB file (15MB ÷ 80KB ≈ 192)
 - ✅ **Cancellation Support**: Graceful cancellation using `CancellationToken`
 - ✅ **Error Handling**: Comprehensive error handling with meaningful exceptions
 - ✅ **Directory Structure Preservation**: Maintains relative paths in archives

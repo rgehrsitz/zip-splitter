@@ -110,7 +110,10 @@ dotnet run --project ZipSplitter.Console -- "C:\Source" "C:\Dest" 50
 - **Memory Usage**: ~80KB buffer per file operation
 - **Throughput**: Processes 1000+ small files in <30 seconds
 - **Scalability**: Handles multi-GB directories efficiently
-- **Progress Granularity**: Byte-level progress tracking
+- **Progress Granularity**: Byte-level progress tracking with 80KB chunk updates
+  - Progress reports every 80KB during single file compression
+  - Smooth progress bars for large files (e.g., ~192 updates for 15MB file)
+  - Real-time feedback throughout compression, not just after file completion
 
 ## 🏆 **Key Achievements**
 
