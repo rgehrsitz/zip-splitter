@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Solution",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "Test",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"test"
+			],
+			"group": "test",
+			"problemMatcher": [
+				"$msCompile"
+			]
+		},
+		{
+			"label": "Run Console Demo",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"ZipSplitter.Console"
+			],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Clean",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"clean"
+			],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Restore",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"restore"
+			],
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}
