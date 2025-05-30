@@ -22,6 +22,12 @@ namespace ZipSplitter.Console
             else
             {
                 await RunInteractiveDemo();
+
+                // Show enhanced features demo
+                System.Console.WriteLine("\n" + new string('=', 50));
+                System.Console.WriteLine("Enhanced Features Demo");
+                System.Console.WriteLine(new string('=', 50));
+                await SingleArchiveDemo.RunSingleArchiveDemo();
             }
 
             // Only prompt for key press if console input is available
@@ -56,7 +62,6 @@ namespace ZipSplitter.Console
                 System.Console.WriteLine($"Error: {ex.Message}");
             }
         }
-
         private static async Task RunInteractiveDemo()
         {
             System.Console.WriteLine("=== ZIP Splitter Demo ===");
@@ -65,13 +70,20 @@ namespace ZipSplitter.Console
             System.Console.WriteLine(
                 "2. Enhanced progress demo (larger files, visual progress bar)"
             );
-            System.Console.Write("Enter choice (1 or 2): ");
+            System.Console.WriteLine("3. Enhanced API demo (single archive, large file handling, compressed limits)");
+            System.Console.Write("Enter choice (1, 2, or 3): ");
 
             var choice = System.Console.ReadLine();
 
             if (choice == "2")
             {
                 await EnhancedProgressDemo.RunDemo();
+                return;
+            }
+
+            if (choice == "3")
+            {
+                await SingleArchiveDemo.RunSingleArchiveDemo();
                 return;
             }
 

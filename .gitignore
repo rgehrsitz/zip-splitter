@@ -405,6 +405,8 @@ TempTest*/
 # Test coverage results
 coverage/
 TestResults/
+CoverageReport/
+*.cobertura.xml
 
 # Mono auto generated files
 mono_crash.*

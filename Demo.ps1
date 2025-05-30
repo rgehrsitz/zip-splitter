@@ -2,13 +2,14 @@
 
 Write-Host "=== ZIP Splitter Demo Script ===" -ForegroundColor Green
 Write-Host ""
-Write-Host "This script demonstrates both demo modes of the ZIP Splitter utility:" -ForegroundColor Cyan
+Write-Host "This script demonstrates all demo modes of the ZIP Splitter utility:" -ForegroundColor Cyan
 Write-Host "1. Quick Demo - Fast demonstration with 2.9MB files" -ForegroundColor Yellow
 Write-Host "2. Enhanced Progress Demo - Visual progress bar with 15MB files" -ForegroundColor Yellow
+Write-Host "3. Enhanced API Demo - Single archive, large file handling, compressed limits" -ForegroundColor Yellow
 Write-Host ""
 
 # Clean up previous demo files
-@("DemoSource", "DemoOutput", "EnhancedDemoSource", "EnhancedDemoOutput") | ForEach-Object {
+@("DemoSource", "DemoOutput", "EnhancedDemoSource", "EnhancedDemoOutput", "EnhancedApiDemoSource", "EnhancedApiDemoOutput") | ForEach-Object {
     if (Test-Path $_) {
         Write-Host "Cleaning up previous demo files ($_)..." -ForegroundColor Yellow
         Remove-Item $_ -Recurse -Force
@@ -38,6 +39,13 @@ Write-Host ""
 "2" | dotnet run --project ZipSplitter.Console
 
 Write-Host ""
+Write-Host "Running Enhanced API Demo (Option 3)..." -ForegroundColor Yellow
+Write-Host ""
+
+# Run enhanced API demo
+"3" | dotnet run --project ZipSplitter.Console
+
+Write-Host ""
 Write-Host "Analyzing results..." -ForegroundColor Yellow
 
 Write-Host ""
@@ -59,7 +67,17 @@ if (Test-Path "EnhancedDemoOutput") {
 }
 
 Write-Host ""
-Write-Host "Demo completed! Both demo modes showcase different aspects:" -ForegroundColor Green
+Write-Host "Enhanced API Demo Results:" -ForegroundColor Green
+if (Test-Path "EnhancedApiDemoOutput") {
+    Get-ChildItem "EnhancedApiDemoOutput" -Filter "*.zip" | ForEach-Object {
+        $size = [math]::Round($_.Length / 1MB, 2)
+        Write-Host "  $($_.Name) - $size MB" -ForegroundColor Cyan
+    }
+}
+
+Write-Host ""
+Write-Host "Demo completed! All demo modes showcase different aspects:" -ForegroundColor Green
 Write-Host "- Quick Demo: Fast processing with basic progress reporting" -ForegroundColor Yellow
 Write-Host "- Enhanced Demo: Visual progress bar with realistic file sizes" -ForegroundColor Yellow
-Write-Host "You can examine the files in DemoSource/DemoOutput and EnhancedDemoSource/EnhancedDemoOutput directories." -ForegroundColor Cyan
+Write-Host "- Enhanced API Demo: Single archive creation, large file handling, compressed size limits" -ForegroundColor Yellow
+Write-Host "You can examine the files in DemoSource/DemoOutput, EnhancedDemoSource/EnhancedDemoOutput, and EnhancedApiDemoSource/EnhancedApiDemoOutput directories." -ForegroundColor Cyan

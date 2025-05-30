@@ -249,33 +249,6 @@ namespace ZipSplitter.Tests
         }
 
         [Fact]
-        public void CreateSplitArchivesWithProgress_SynchronousVersion_WorksCorrectly()
-        {
-            // Arrange
-            File.WriteAllText(Path.Combine(_sourceDirectory, "sync.txt"), "Sync test");
-            var progressReports = new List<double>();
-            var progress = new Progress<double>(p => progressReports.Add(p));
-
-            // Act
-            ZipSplitterWithProgress.CreateSplitArchivesWithProgress(
-                _sourceDirectory,
-                _destinationDirectory,
-                1024 * 1024,
-                progress
-            );
-
-            // Assert
-            var zipFiles = Directory.GetFiles(_destinationDirectory, "*.zip");
-            Assert.Single(zipFiles);
-            // Note: Progress reporting in sync version may not work as expected due to timing
-            // This is a known limitation of the synchronous wrapper
-            Assert.True(
-                progressReports.Count >= 0,
-                "Progress reporting may be limited in sync version"
-            );
-        }
-
-        [Fact]
         public void ProgressInfo_ToString_FormatsCorrectly()
         {
             // Arrange

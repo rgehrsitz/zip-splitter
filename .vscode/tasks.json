@@ -2,60 +2,55 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build Solution",
-			"type": "shell",
-			"command": "dotnet",
 			"args": [
-				"build"
+				"test",
+				"--collect:XPlat Code Coverage"
 			],
-			"group": "build",
-			"problemMatcher": [
-				"$msCompile"
-			]
+			"command": "dotnet",
+			"group": "test",
+			"label": "Test with Coverage",
+			"presentation": {
+				"echo": true,
+				"focus": false,
+				"panel": "shared",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell"
 		},
 		{
-			"label": "Test",
-			"type": "shell",
-			"command": "dotnet",
 			"args": [
-				"test"
+				"-reports:ZipSplitter.Tests\\TestResults\\*\\coverage.cobertura.xml",
+				"-targetdir:CoverageReport",
+				"-reporttypes:Html"
+			],
+			"command": "reportgenerator",
+			"group": "test",
+			"label": "Generate Coverage Report",
+			"presentation": {
+				"echo": true,
+				"focus": false,
+				"panel": "shared",
+				"reveal": "always"
+			},
+			"problemMatcher": [],
+			"type": "shell",
+			"dependsOn": "Test with Coverage"
+		},
+		{
+			"label": "Full Coverage Analysis",
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"Test with Coverage",
+				"Generate Coverage Report"
 			],
 			"group": "test",
-			"problemMatcher": [
-				"$msCompile"
-			]
-		},
-		{
-			"label": "Run Console Demo",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"run",
-				"--project",
-				"ZipSplitter.Console"
-			],
-			"group": "build",
-			"problemMatcher": []
-		},
-		{
-			"label": "Clean",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"clean"
-			],
-			"group": "build",
-			"problemMatcher": []
-		},
-		{
-			"label": "Restore",
-			"type": "shell",
-			"command": "dotnet",
-			"args": [
-				"restore"
-			],
-			"group": "build",
-			"problemMatcher": []
+			"presentation": {
+				"echo": true,
+				"focus": false,
+				"panel": "shared",
+				"reveal": "always"
+			}
 		}
 	]
 }

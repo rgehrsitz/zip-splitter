@@ -1,0 +1,10 @@
+{
+    "coverage-gutters.coverageFileNames": [
+        "ZipSplitter.Tests/TestResults/*/coverage.cobertura.xml",
+        "CoverageReport/Cobertura.xml"
+    ],
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "coverage-gutters.lcovname": "coverage.cobertura.xml"
+}

@@ -2,9 +2,41 @@
 
 All notable changes and improvements to the ZIP Splitter project are documented in this file.
 
+## [3.0.0] - 2025-05-29
+
+### Added - Major API Enhancement
+
+- ✅ **New Enhanced API**: `CreateArchivesAsync` with flexible `SplitOptions` configuration
+- ✅ **Archive Strategies**:
+  - `ArchiveStrategy.SplitBySize`: Traditional splitting behavior
+  - `ArchiveStrategy.SingleArchive`: Create single archive regardless of size
+- ✅ **Large File Handling Options**:
+  - `LargeFileHandling.ThrowException`: Strict size enforcement (default behavior)
+  - `LargeFileHandling.CreateSeparateArchive`: Create individual archives for large files
+  - `LargeFileHandling.SkipFile`: Skip large files and report them
+  - `LargeFileHandling.CopyUncompressed`: Copy large files without compression
+- ✅ **Size Limit Types**:
+  - `SizeLimitType.UncompressedData`: Limit based on original file sizes (default)
+  - `SizeLimitType.CompressedArchive`: Limit based on estimated ZIP file sizes
+- ✅ **Enhanced Results**: `SplitResult` class with detailed operation information
+- ✅ **Custom Archive Names**: Configurable single archive naming
+- ✅ **Compression Ratio Estimation**: Configurable for compressed size calculations
+
+### Improved
+
+- **API Design**: More flexible and extensible configuration system
+- **Backward Compatibility**: All existing APIs remain functional
+- **Documentation**: Comprehensive updates to reflect new capabilities
+- **Error Messages**: Improved clarity for validation and runtime errors
+
+### Breaking Changes
+
+- None - Full backward compatibility maintained
+
 ## [2.1.0] - 2025-05-29
 
 ### Added
+
 - ✅ **Enhanced Progress Demo**: New visual progress demonstration with 15MB of realistic files
 - ✅ **Visual Progress Bar**: 50-character progress bar display (`█░░░░░░░░░░░░░░░░░░░`)
 - ✅ **Demo Mode Selection**: Console app now offers Quick Demo vs Enhanced Progress Demo
@@ -12,6 +44,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - ✅ **Realistic Demo Files**: Database, photos, PDFs, source code, and documentation files
 
 ### Improved
+
 - **Progress Visualization**: Enhanced demo showcases progress reporting capabilities
 - **Demo Experience**: Two distinct demo modes for different use cases
 - **Cross-Platform Compatibility**: Better handling of console input in various environments
@@ -20,6 +53,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 ## [2.1.0] - 2025-05-29
 
 ### Added
+
 - ✅ **Enhanced Progress Demo**: New comprehensive demo mode with visual progress bar
 - ✅ **Visual Progress Bar**: 50-character progress display (`█░░░░░░░░░░░░░░░░░░░`)
 - ✅ **Realistic Demo Files**: 15MB of diverse file types (database, photos, documents, source code)
@@ -27,18 +61,21 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - ✅ **Input Redirection Support**: Console apps work with piped input (e.g., `echo "2" | dotnet run`)
 
 ### Improved
+
 - **Progress Reporting Scope**: Clarified that progress represents entire operation (0-100% across all archives)
 - **Console Experience**: Enhanced visual feedback with real-time archive index and current file display
 - **Demo Variety**: Realistic file types including database.db, photo1.jpg, manual.pdf, source.zip, etc.
 - **Cross-Platform Input**: Proper handling of input redirection for automated scenarios
 
 ### Fixed
+
 - **Console.ReadKey() Exception**: Fixed crashes when input is redirected by checking `Environment.UserInteractive` and `Console.IsInputRedirected`
 - **Demo Reliability**: Both demo modes now work flawlessly in various execution environments
 
 ## [2.0.0] - 2025-05-29
 
 ### Added
+
 - ✅ **Async/Await Support**: Complete rewrite with async/await for non-blocking I/O operations
 - ✅ **Enhanced Progress Reporting**: New `ProgressInfo` class with detailed progress information
 - ✅ **Cancellation Support**: Graceful cancellation using `CancellationToken`
@@ -51,6 +88,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - ✅ **Project Structure**: Multi-project solution with proper separation of concerns
 
 ### Improved
+
 - **Architecture**: Better separation of concerns with testable interfaces
 - **Performance**: Streaming operations for efficient memory usage
 - **Reliability**: Robust error handling and input validation
@@ -59,6 +97,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - **Path Handling**: Cross-platform path handling for directory structures
 
 ### Fixed
+
 - **File Size Validation**: Prevents individual files larger than archive size limit
 - **Directory Structure**: Preserves relative paths in ZIP archives
 - **Memory Usage**: Efficient streaming instead of loading entire files
@@ -66,6 +105,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 
 ### Technical Details
+
 - **Target Framework**: .NET 9.0
 - **Dependencies**: System.IO.Compression (built-in)
 - **Test Framework**: xUnit with Moq for mocking
@@ -75,6 +115,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 ## [1.0.0] - Original Implementation
 
 ### Features
+
 - Basic ZIP splitting functionality
 - Simple progress reporting via `IProgress<double>`
 - Console output for file operations
@@ -82,6 +123,7 @@ All notable changes and improvements to the ZIP Splitter project are documented 
 - Directory traversal with `SearchOption.AllDirectories`
 
 ### Limitations
+
 - Synchronous I/O operations
 - Basic error handling
 - No cancellation support
