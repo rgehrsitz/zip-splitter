@@ -64,11 +64,27 @@ namespace ZipSplitter.Core
 
             if (options.ArchiveStrategy == ArchiveStrategy.SingleArchive)
             {
-                await CreateSingleArchiveAsync(allFiles, sourceDirectory, destinationDirectory, options, result, progress, cancellationToken);
+                await CreateSingleArchiveAsync(
+                    allFiles,
+                    sourceDirectory,
+                    destinationDirectory,
+                    options,
+                    result,
+                    progress,
+                    cancellationToken
+                );
             }
             else
             {
-                await CreateSplitArchivesAsync(allFiles, sourceDirectory, destinationDirectory, options, result, progress, cancellationToken);
+                await CreateSplitArchivesAsync(
+                    allFiles,
+                    sourceDirectory,
+                    destinationDirectory,
+                    options,
+                    result,
+                    progress,
+                    cancellationToken
+                );
             }
 
             result.Duration = DateTime.UtcNow - startTime;
@@ -82,7 +98,8 @@ namespace ZipSplitter.Core
             SplitOptions options,
             SplitResult result,
             IProgress<ProgressInfo>? progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             var fileInfos = allFiles.Select(f => new FileInfo(f)).ToList();
             long totalBytes = fileInfos.Sum(f => f.Length);
@@ -101,11 +118,22 @@ namespace ZipSplitter.Core
 
                 string entryName = Path.GetRelativePath(sourceDirectory, fileInfo.FullName);
 
-                bytesProcessed = await AddFileToArchiveAsync(fileInfo, entryName, archive, bytesProcessed, totalBytes, 1, progress, cancellationToken);
+                bytesProcessed = await AddFileToArchiveAsync(
+                    fileInfo,
+                    entryName,
+                    archive,
+                    bytesProcessed,
+                    totalBytes,
+                    1,
+                    progress,
+                    cancellationToken
+                );
                 result.TotalBytesProcessed = bytesProcessed;
             }
 
-            progress?.Report(new ProgressInfo(100, 1, bytesProcessed, "Single archive creation completed"));
+            progress?.Report(
+                new ProgressInfo(100, 1, bytesProcessed, "Single archive creation completed")
+            );
         }
 
         private static async Task CreateSplitArchivesAsync(
@@ -115,15 +143,17 @@ namespace ZipSplitter.Core
             SplitOptions options,
             SplitResult result,
             IProgress<ProgressInfo>? progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             var processableFiles = new List<FileInfo>();
             long totalBytes = 0;
 
             // Calculate effective size limit based on options
-            long effectiveSizeLimit = options.SizeLimitType == SizeLimitType.CompressedArchive
-                ? (long)(options.MaxSizeBytes / options.EstimatedCompressionRatio)
-                : options.MaxSizeBytes;
+            long effectiveSizeLimit =
+                options.SizeLimitType == SizeLimitType.CompressedArchive
+                    ? (long)(options.MaxSizeBytes / options.EstimatedCompressionRatio)
+                    : options.MaxSizeBytes;
 
             // Categorize files and handle large files
             foreach (var file in allFiles)
@@ -134,7 +164,14 @@ namespace ZipSplitter.Core
 
                 if (fileInfo.Length > effectiveSizeLimit)
                 {
-                    await HandleLargeFileAsync(fileInfo, sourceDirectory, destinationDirectory, options, result, cancellationToken);
+                    await HandleLargeFileAsync(
+                        fileInfo,
+                        sourceDirectory,
+                        destinationDirectory,
+                        options,
+                        result,
+                        cancellationToken
+                    );
                 }
                 else
                 {
@@ -145,13 +182,28 @@ namespace ZipSplitter.Core
 
             if (processableFiles.Count == 0)
             {
-                progress?.Report(new ProgressInfo(100, 0, result.TotalBytesProcessed, "No files to compress in split archives"));
+                progress?.Report(
+                    new ProgressInfo(
+                        100,
+                        0,
+                        result.TotalBytesProcessed,
+                        "No files to compress in split archives"
+                    )
+                );
                 return;
             }
 
             // Process normal files into split archives
-            await ProcessNormalFilesAsync(processableFiles, sourceDirectory, destinationDirectory,
-                effectiveSizeLimit, totalBytes, result, progress, cancellationToken);
+            await ProcessNormalFilesAsync(
+                processableFiles,
+                sourceDirectory,
+                destinationDirectory,
+                effectiveSizeLimit,
+                totalBytes,
+                result,
+                progress,
+                cancellationToken
+            );
         }
 
         private static async Task HandleLargeFileAsync(
@@ -160,7 +212,8 @@ namespace ZipSplitter.Core
             string destinationDirectory,
             SplitOptions options,
             SplitResult result,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             string relativePath = Path.GetRelativePath(sourceDirectory, fileInfo.FullName);
 
@@ -172,24 +225,42 @@ namespace ZipSplitter.Core
                     );
 
                 case LargeFileHandling.CreateSeparateArchive:
-                    string archiveName = $"large_file_{Path.GetFileNameWithoutExtension(fileInfo.Name)}.zip";
+                    string archiveName =
+                        $"large_file_{Path.GetFileNameWithoutExtension(fileInfo.Name)}.zip";
                     string archivePath = Path.Combine(destinationDirectory, archiveName);
 
                     using (var archive = CreateNewArchive(archivePath))
                     {
-                        await AddFileToArchiveAsync(fileInfo, relativePath, archive, cancellationToken);
+                        await AddFileToArchiveAsync(
+                            fileInfo,
+                            relativePath,
+                            archive,
+                            cancellationToken
+                        );
                     }
 
                     result.CreatedArchives.Add(archivePath);
-                    result.SpeciallyHandledFiles.Add(new FileHandlingInfo(
-                        fileInfo.FullName, fileInfo.Length, LargeFileHandling.CreateSeparateArchive,
-                        archivePath, "File too large for regular archives"));
+                    result.SpeciallyHandledFiles.Add(
+                        new FileHandlingInfo(
+                            fileInfo.FullName,
+                            fileInfo.Length,
+                            LargeFileHandling.CreateSeparateArchive,
+                            archivePath,
+                            "File too large for regular archives"
+                        )
+                    );
                     break;
 
                 case LargeFileHandling.SkipFile:
-                    result.SpeciallyHandledFiles.Add(new FileHandlingInfo(
-                        fileInfo.FullName, fileInfo.Length, LargeFileHandling.SkipFile,
-                        null, "File skipped due to size constraints"));
+                    result.SpeciallyHandledFiles.Add(
+                        new FileHandlingInfo(
+                            fileInfo.FullName,
+                            fileInfo.Length,
+                            LargeFileHandling.SkipFile,
+                            null,
+                            "File skipped due to size constraints"
+                        )
+                    );
                     break;
 
                 case LargeFileHandling.CopyUncompressed:
@@ -201,9 +272,15 @@ namespace ZipSplitter.Core
                     }
                     File.Copy(fileInfo.FullName, destPath, true);
 
-                    result.SpeciallyHandledFiles.Add(new FileHandlingInfo(
-                        fileInfo.FullName, fileInfo.Length, LargeFileHandling.CopyUncompressed,
-                        destPath, "File copied uncompressed due to size"));
+                    result.SpeciallyHandledFiles.Add(
+                        new FileHandlingInfo(
+                            fileInfo.FullName,
+                            fileInfo.Length,
+                            LargeFileHandling.CopyUncompressed,
+                            destPath,
+                            "File copied uncompressed due to size"
+                        )
+                    );
                     break;
             }
 
@@ -218,7 +295,8 @@ namespace ZipSplitter.Core
             long totalBytes,
             SplitResult result,
             IProgress<ProgressInfo>? progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             long bytesProcessed = result.TotalBytesProcessed;
             int archiveIndex = result.CreatedArchives.Count + 1;
@@ -238,7 +316,10 @@ namespace ZipSplitter.Core
                     long fileSize = fileInfo.Length;
 
                     // Check if we need to create a new archive
-                    if (currentArchiveSize + fileSize > maxArchiveSizeBytes && currentArchiveSize > 0)
+                    if (
+                        currentArchiveSize + fileSize > maxArchiveSizeBytes
+                        && currentArchiveSize > 0
+                    )
                     {
                         currentArchive?.Dispose();
                         archiveIndex++;
@@ -250,13 +331,23 @@ namespace ZipSplitter.Core
 
                     string entryName = Path.GetRelativePath(sourceDirectory, fileInfo.FullName);
 
-                    bytesProcessed = await AddFileToArchiveAsync(fileInfo, entryName, currentArchive, bytesProcessed,
-                        totalBytes + result.TotalBytesProcessed, archiveIndex, progress, cancellationToken);
+                    bytesProcessed = await AddFileToArchiveAsync(
+                        fileInfo,
+                        entryName,
+                        currentArchive,
+                        bytesProcessed,
+                        totalBytes + result.TotalBytesProcessed,
+                        archiveIndex,
+                        progress,
+                        cancellationToken
+                    );
 
                     currentArchiveSize += fileSize;
                 }
                 result.TotalBytesProcessed = bytesProcessed;
-                progress?.Report(new ProgressInfo(100, archiveIndex, bytesProcessed, "Compression completed"));
+                progress?.Report(
+                    new ProgressInfo(100, archiveIndex, bytesProcessed, "Compression completed")
+                );
             }
             finally
             {
@@ -268,22 +359,34 @@ namespace ZipSplitter.Core
             FileInfo fileInfo,
             string entryName,
             ZipArchive archive,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             try
             {
-                using var sourceStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var sourceStream = new FileStream(
+                    fileInfo.FullName,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
                 var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
                 using var entryStream = entry.Open();
                 await sourceStream.CopyToAsync(entryStream, cancellationToken);
             }
             catch (UnauthorizedAccessException ex)
             {
-                throw new InvalidOperationException($"Access denied to file: {fileInfo.FullName}", ex);
+                throw new InvalidOperationException(
+                    $"Access denied to file: {fileInfo.FullName}",
+                    ex
+                );
             }
             catch (IOException ex)
             {
-                throw new InvalidOperationException($"I/O error processing file: {fileInfo.FullName}", ex);
+                throw new InvalidOperationException(
+                    $"I/O error processing file: {fileInfo.FullName}",
+                    ex
+                );
             }
         }
 
@@ -295,18 +398,33 @@ namespace ZipSplitter.Core
             long totalBytes,
             int archiveIndex,
             IProgress<ProgressInfo>? progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             try
             {
-                using var sourceStream = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var sourceStream = new FileStream(
+                    fileInfo.FullName,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
                 var entry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
                 using var entryStream = entry.Open();
 
                 // 80KB buffer for streaming file data with progress reporting
                 var buffer = new byte[81920]; // 80 KB buffer
                 int bytesRead;
-                while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                while (
+                    (
+                        bytesRead = await sourceStream.ReadAsync(
+                            buffer,
+                            0,
+                            buffer.Length,
+                            cancellationToken
+                        )
+                    ) > 0
+                )
                 {
                     await entryStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
                     bytesProcessed += bytesRead;
@@ -326,11 +444,17 @@ namespace ZipSplitter.Core
             }
             catch (UnauthorizedAccessException ex)
             {
-                throw new InvalidOperationException($"Access denied to file: {fileInfo.FullName}", ex);
+                throw new InvalidOperationException(
+                    $"Access denied to file: {fileInfo.FullName}",
+                    ex
+                );
             }
             catch (IOException ex)
             {
-                throw new InvalidOperationException($"I/O error processing file: {fileInfo.FullName}", ex);
+                throw new InvalidOperationException(
+                    $"I/O error processing file: {fileInfo.FullName}",
+                    ex
+                );
             }
         }
 
@@ -364,10 +488,16 @@ namespace ZipSplitter.Core
             {
                 ArchiveStrategy = ArchiveStrategy.SplitBySize,
                 MaxSizeBytes = maxArchiveSizeBytes,
-                LargeFileHandling = LargeFileHandling.ThrowException // Default strict behavior
+                LargeFileHandling = LargeFileHandling.ThrowException, // Default strict behavior
             };
 
-            await CreateArchivesAsync(sourceDirectory, destinationDirectory, options, progress, cancellationToken);
+            await CreateArchivesAsync(
+                sourceDirectory,
+                destinationDirectory,
+                options,
+                progress,
+                cancellationToken
+            );
         }
 
         private static string GetArchivePath(string destinationDirectory, int index)

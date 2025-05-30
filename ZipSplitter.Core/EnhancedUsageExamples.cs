@@ -18,12 +18,14 @@ namespace ZipSplitter.Examples
             var options = new SplitOptions
             {
                 ArchiveStrategy = ArchiveStrategy.SingleArchive,
-                SingleArchiveName = "complete_backup.zip"
+                SingleArchiveName = "complete_backup.zip",
             };
 
             var progress = new Progress<ProgressInfo>(info =>
             {
-                Console.WriteLine($"Progress: {info.PercentageComplete:F1}% - {info.CurrentOperation}");
+                Console.WriteLine(
+                    $"Progress: {info.PercentageComplete:F1}% - {info.CurrentOperation}"
+                );
             });
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -50,12 +52,14 @@ namespace ZipSplitter.Examples
                 MaxSizeBytes = 50 * 1024 * 1024, // 50MB
                 SizeLimitType = SizeLimitType.CompressedArchive, // Limit final ZIP size
                 LargeFileHandling = LargeFileHandling.CreateSeparateArchive,
-                EstimatedCompressionRatio = 0.6 // Assume 40% compression
+                EstimatedCompressionRatio = 0.6, // Assume 40% compression
             };
 
             var progress = new Progress<ProgressInfo>(info =>
             {
-                Console.WriteLine($"Archive {info.CurrentArchiveIndex}: {info.PercentageComplete:F1}% - {info.CurrentOperation}");
+                Console.WriteLine(
+                    $"Archive {info.CurrentArchiveIndex}: {info.PercentageComplete:F1}% - {info.CurrentOperation}"
+                );
             });
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -73,7 +77,9 @@ namespace ZipSplitter.Examples
                 Console.WriteLine("\nSpecial file handling:");
                 foreach (var file in result.SpeciallyHandledFiles)
                 {
-                    Console.WriteLine($"  {file.HandlingMethod}: {file.FilePath} -> {file.OutputPath ?? "N/A"}");
+                    Console.WriteLine(
+                        $"  {file.HandlingMethod}: {file.FilePath} -> {file.OutputPath ?? "N/A"}"
+                    );
                     Console.WriteLine($"    Reason: {file.Reason}");
                 }
             }
@@ -89,7 +95,7 @@ namespace ZipSplitter.Examples
                 ArchiveStrategy = ArchiveStrategy.SplitBySize,
                 MaxSizeBytes = 100 * 1024 * 1024, // 100MB
                 LargeFileHandling = LargeFileHandling.CopyUncompressed,
-                SizeLimitType = SizeLimitType.UncompressedData
+                SizeLimitType = SizeLimitType.UncompressedData,
             };
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -116,7 +122,7 @@ namespace ZipSplitter.Examples
             {
                 ArchiveStrategy = ArchiveStrategy.SplitBySize,
                 MaxSizeBytes = 10 * 1024 * 1024, // 10MB
-                LargeFileHandling = LargeFileHandling.SkipFile
+                LargeFileHandling = LargeFileHandling.SkipFile,
             };
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -170,7 +176,7 @@ namespace ZipSplitter.Examples
                 MaxSizeBytes = 25 * 1024 * 1024, // 25MB
                 SizeLimitType = SizeLimitType.CompressedArchive,
                 LargeFileHandling = LargeFileHandling.CreateSeparateArchive,
-                EstimatedCompressionRatio = 0.7
+                EstimatedCompressionRatio = 0.7,
             };
 
             var progress = new Progress<ProgressInfo>(info =>
@@ -178,7 +184,9 @@ namespace ZipSplitter.Examples
                 // Update progress every 80KB for smooth UI updates
                 if (info.BytesProcessed % (80 * 1024) == 0 || info.PercentageComplete >= 100)
                 {
-                    Console.Write($"\rProgress: {info.PercentageComplete:F1}% | Archive {info.CurrentArchiveIndex} | {info.BytesProcessed:N0} bytes");
+                    Console.Write(
+                        $"\rProgress: {info.PercentageComplete:F1}% | Archive {info.CurrentArchiveIndex} | {info.BytesProcessed:N0} bytes"
+                    );
                 }
             });
 
@@ -199,7 +207,9 @@ namespace ZipSplitter.Examples
 
             if (result.HasWarnings)
             {
-                Console.WriteLine($"\n=== SPECIAL FILE HANDLING ({result.SpeciallyHandledFiles.Count}) ===");
+                Console.WriteLine(
+                    $"\n=== SPECIAL FILE HANDLING ({result.SpeciallyHandledFiles.Count}) ==="
+                );
                 foreach (var file in result.SpeciallyHandledFiles)
                 {
                     Console.WriteLine($"Method: {file.HandlingMethod}");

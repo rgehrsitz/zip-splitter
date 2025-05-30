@@ -18,7 +18,8 @@ namespace ZipSplitter.Console
 
             // Create a temporary test directory with some files
             string tempSourceDir = Path.Combine(Path.GetTempPath(), "ZipSplitterTest", "Source");
-            string tempDestDir = Path.Combine(Path.GetTempPath(), "ZipSplitterTest", "Output"); try
+            string tempDestDir = Path.Combine(Path.GetTempPath(), "ZipSplitterTest", "Output");
+            try
             {
                 // Setup test data
                 SetupTestData(tempSourceDir);
@@ -34,7 +35,6 @@ namespace ZipSplitter.Console
 
                 // Demo 3: Compressed size limit
                 await DemoCompressedSizeLimit(tempSourceDir, tempDestDir);
-
             }
             finally
             {
@@ -46,9 +46,12 @@ namespace ZipSplitter.Console
                         Directory.Delete(Path.Combine(Path.GetTempPath(), "ZipSplitterTest"), true);
                     }
                 }
-                catch { /* Ignore cleanup errors */ }
+                catch
+                { /* Ignore cleanup errors */
+                }
             }
         }
+
         private static async Task DemoSingleArchive(string sourceDir, string destDir)
         {
             System.Console.WriteLine("=== Demo 1: Single Archive (All Files) ===");
@@ -56,10 +59,13 @@ namespace ZipSplitter.Console
             var options = new SplitOptions
             {
                 ArchiveStrategy = ArchiveStrategy.SingleArchive,
-                SingleArchiveName = "complete_backup.zip"
-            }; var progress = new Progress<ProgressInfo>(info =>
+                SingleArchiveName = "complete_backup.zip",
+            };
+            var progress = new Progress<ProgressInfo>(info =>
             {
-                System.Console.Write($"\rProgress: {info.PercentageComplete:F1}% - {info.CurrentOperation}");
+                System.Console.Write(
+                    $"\rProgress: {info.PercentageComplete:F1}% - {info.CurrentOperation}"
+                );
             });
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -68,22 +74,31 @@ namespace ZipSplitter.Console
                 options,
                 progress,
                 CancellationToken.None
-            ); System.Console.WriteLine($"\n✓ Created: {result.CreatedArchives[0]}");
+            );
+            System.Console.WriteLine($"\n✓ Created: {result.CreatedArchives[0]}");
             System.Console.WriteLine($"  Strategy: {result.StrategyUsed}");
             System.Console.WriteLine($"  Size: {result.TotalBytesProcessed:N0} bytes");
             System.Console.WriteLine($"  Duration: {result.Duration}\n");
         }
-        private static async Task DemoSplitArchivesWithLargeFileHandling(string sourceDir, string destDir)
+
+        private static async Task DemoSplitArchivesWithLargeFileHandling(
+            string sourceDir,
+            string destDir
+        )
         {
-            System.Console.WriteLine("=== Demo 2: Split Archives with Large File Handling ==="); var options = new SplitOptions
+            System.Console.WriteLine("=== Demo 2: Split Archives with Large File Handling ===");
+            var options = new SplitOptions
             {
                 ArchiveStrategy = ArchiveStrategy.SplitBySize,
                 MaxSizeBytes = 1024 * 1024, // 1MB to demonstrate splitting with small files
                 LargeFileHandling = LargeFileHandling.CreateSeparateArchive,
-                SizeLimitType = SizeLimitType.UncompressedData
-            }; var progress = new Progress<ProgressInfo>(info =>
+                SizeLimitType = SizeLimitType.UncompressedData,
+            };
+            var progress = new Progress<ProgressInfo>(info =>
             {
-                System.Console.Write($"\rArchive {info.CurrentArchiveIndex}: {info.PercentageComplete:F1}%");
+                System.Console.Write(
+                    $"\rArchive {info.CurrentArchiveIndex}: {info.PercentageComplete:F1}%"
+                );
             });
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -92,39 +107,49 @@ namespace ZipSplitter.Console
                 options,
                 progress,
                 CancellationToken.None
-            ); System.Console.WriteLine($"\n✓ Created {result.CreatedArchives.Count} archives");
+            );
+            System.Console.WriteLine($"\n✓ Created {result.CreatedArchives.Count} archives");
             System.Console.WriteLine($"  Strategy: {result.StrategyUsed}");
             System.Console.WriteLine($"  Total Size: {result.TotalBytesProcessed:N0} bytes");
 
             if (result.HasWarnings)
             {
-                System.Console.WriteLine($"  Special handling: {result.SpeciallyHandledFiles.Count} files");
+                System.Console.WriteLine(
+                    $"  Special handling: {result.SpeciallyHandledFiles.Count} files"
+                );
                 foreach (var file in result.SpeciallyHandledFiles)
                 {
-                    System.Console.WriteLine($"    {file.HandlingMethod}: {Path.GetFileName(file.FilePath)}");
+                    System.Console.WriteLine(
+                        $"    {file.HandlingMethod}: {Path.GetFileName(file.FilePath)}"
+                    );
                 }
             }
             System.Console.WriteLine();
         }
+
         private static async Task DemoCompressedSizeLimit(string sourceDir, string destDir)
         {
-            System.Console.WriteLine("=== Demo 3: Compressed Size Limit ==="); var options = new SplitOptions
+            System.Console.WriteLine("=== Demo 3: Compressed Size Limit ===");
+            var options = new SplitOptions
             {
                 ArchiveStrategy = ArchiveStrategy.SplitBySize,
                 MaxSizeBytes = 2 * 1024 * 1024, // 2MB compressed size
                 SizeLimitType = SizeLimitType.CompressedArchive,
                 LargeFileHandling = LargeFileHandling.SkipFile,
-                EstimatedCompressionRatio = 0.8 // Assume 20% compression
+                EstimatedCompressionRatio = 0.8, // Assume 20% compression
             };
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(
                 sourceDir,
                 Path.Combine(destDir, "CompressedSizeLimit"),
                 options
-            ); System.Console.WriteLine($"✓ Created {result.CreatedArchives.Count} archives");
+            );
+            System.Console.WriteLine($"✓ Created {result.CreatedArchives.Count} archives");
             System.Console.WriteLine($"  Strategy: {result.StrategyUsed}");
             System.Console.WriteLine($"  Size Limit Type: {options.SizeLimitType}");
-            System.Console.WriteLine($"  Estimated Compression: {(1 - options.EstimatedCompressionRatio) * 100:F0}%");
+            System.Console.WriteLine(
+                $"  Estimated Compression: {(1 - options.EstimatedCompressionRatio) * 100:F0}%"
+            );
 
             if (result.SkippedFiles.Any())
             {
@@ -148,7 +173,8 @@ namespace ZipSplitter.Console
 
             // Create subdirectory with files
             string subDir = Path.Combine(sourceDir, "subfolder");
-            Directory.CreateDirectory(subDir); File.WriteAllText(Path.Combine(subDir, "nested1.txt"), new string('E', 15 * 1024)); // 15KB
+            Directory.CreateDirectory(subDir);
+            File.WriteAllText(Path.Combine(subDir, "nested1.txt"), new string('E', 15 * 1024)); // 15KB
             File.WriteAllText(Path.Combine(subDir, "nested2.txt"), new string('F', 12 * 1024)); // 12KB
 
             System.Console.WriteLine("✓ Test data created");

@@ -15,7 +15,13 @@ namespace ZipSplitter.Core
         public string? OutputPath { get; }
         public string Reason { get; }
 
-        public FileHandlingInfo(string filePath, long fileSizeBytes, LargeFileHandling handlingMethod, string? outputPath, string reason)
+        public FileHandlingInfo(
+            string filePath,
+            long fileSizeBytes,
+            LargeFileHandling handlingMethod,
+            string? outputPath,
+            string reason
+        )
         {
             FilePath = filePath;
             FileSizeBytes = fileSizeBytes;
@@ -47,18 +53,23 @@ namespace ZipSplitter.Core
         /// Gets files that were copied uncompressed.
         /// </summary>
         public IEnumerable<FileHandlingInfo> UncompressedFiles =>
-            SpeciallyHandledFiles.Where(f => f.HandlingMethod == LargeFileHandling.CopyUncompressed);
+            SpeciallyHandledFiles.Where(f =>
+                f.HandlingMethod == LargeFileHandling.CopyUncompressed
+            );
 
         /// <summary>
         /// Gets files that were put in separate archives.
         /// </summary>
         public IEnumerable<FileHandlingInfo> SeparateArchiveFiles =>
-            SpeciallyHandledFiles.Where(f => f.HandlingMethod == LargeFileHandling.CreateSeparateArchive);
+            SpeciallyHandledFiles.Where(f =>
+                f.HandlingMethod == LargeFileHandling.CreateSeparateArchive
+            );
 
         public override string ToString()
         {
-            var result = $"Strategy: {StrategyUsed}, Archives: {CreatedArchives.Count}, " +
-                        $"Total Size: {TotalBytesProcessed:N0} bytes, Duration: {Duration}";
+            var result =
+                $"Strategy: {StrategyUsed}, Archives: {CreatedArchives.Count}, "
+                + $"Total Size: {TotalBytesProcessed:N0} bytes, Duration: {Duration}";
 
             if (HasWarnings)
             {

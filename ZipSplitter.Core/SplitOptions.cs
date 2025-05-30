@@ -25,7 +25,7 @@ namespace ZipSplitter.Core
         /// <summary>
         /// Copy the large file uncompressed to the destination directory.
         /// </summary>
-        CopyUncompressed
+        CopyUncompressed,
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ namespace ZipSplitter.Core
         /// <summary>
         /// Limit based on the resulting ZIP file size (approximate).
         /// </summary>
-        CompressedArchive
+        CompressedArchive,
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ namespace ZipSplitter.Core
         /// <summary>
         /// Create a single archive containing all files regardless of size.
         /// </summary>
-        SingleArchive
+        SingleArchive,
     }
 
     /// <summary>
@@ -80,7 +80,8 @@ namespace ZipSplitter.Core
         /// How to handle files that exceed the maximum size. Default is CreateSeparateArchive.
         /// Only applies when ArchiveStrategy is SplitBySize.
         /// </summary>
-        public LargeFileHandling LargeFileHandling { get; set; } = LargeFileHandling.CreateSeparateArchive;
+        public LargeFileHandling LargeFileHandling { get; set; } =
+            LargeFileHandling.CreateSeparateArchive;
 
         /// <summary>
         /// What the size limit represents. Default is UncompressedData for backward compatibility.
