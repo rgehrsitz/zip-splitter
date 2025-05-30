@@ -8,16 +8,16 @@ The ZIP Splitter has been enhanced with new configuration options that provide m
 
 ### 1. Archive Strategy Options
 
-- **`ArchiveStrategy.SplitBySize`**: Split files into multiple archives based on size limits (original behavior)
-- **`ArchiveStrategy.SingleArchive`**: Create a single archive containing all files regardless of size
+- **`ArchiveStrategy.SplitBySize`**: Split files into multiple archives based on size limits. Archives are named sequentially by default (e.g., `archive001.zip`, `archive002.zip`, etc.).
+- **`ArchiveStrategy.SingleArchive`**: Create a single archive containing all files regardless of size. The name is specified by the `SingleArchiveName` property in `SplitOptions`.
 
 ### 2. Large File Handling Options
 
 When using split archives, files that exceed the size limit can be handled in multiple ways:
 
-- **`LargeFileHandling.ThrowException`**: Throw an exception (original behavior)
-- **`LargeFileHandling.CreateSeparateArchive`**: Create a separate archive for the large file
-- **`LargeFileHandling.SkipFile`**: Skip the file and report it in results
+- **`LargeFileHandling.ThrowException`**: Throw an exception (original behavior).
+- **`LargeFileHandling.CreateSeparateArchive`**: Create a separate archive for the large file, named `large_file_{OriginalFileNameWithoutExtension}.zip`.
+- **`LargeFileHandling.SkipFile`**: Skip the file and report it in results.
 - **`LargeFileHandling.CopyUncompressed`**: Copy the file uncompressed to destination
 
 ### 3. Size Limit Types

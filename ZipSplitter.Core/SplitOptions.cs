@@ -97,9 +97,20 @@ namespace ZipSplitter.Core
 
         /// <summary>
         /// The name for the single archive when using SingleArchive strategy.
-        /// Default is "archive.zip".
+        /// Default is "archive.zip". This name is used directly for the output file.
+        /// It must end with ".zip".
         /// </summary>
         public string SingleArchiveName { get; set; } = "archive.zip";
+
+        /// <summary>
+        /// Base name for sequentially numbered archives when using SplitBySize strategy.
+        /// Default is "archive". Resulting files will be "archive001.zip", "archive002.zip", etc.
+        /// This is not currently customizable through SplitOptions but reflects the default behavior.
+        /// Large files handled with CreateSeparateArchive will be named "large_file_{OriginalFileNameWithoutExtension}.zip".
+        /// </summary>
+        // Note: This is a conceptual property to aid documentation of default behavior.
+        // The actual naming logic is in ZipSplitterWithProgress.GetArchivePath and HandleLargeFileAsync.
+        public string SplitArchiveBaseName { get; } = "archive"; // Readonly, reflects current default
 
         /// <summary>
         /// Validates the options and throws ArgumentException if invalid.

@@ -18,7 +18,7 @@ namespace ZipSplitter.Examples
             var options = new SplitOptions
             {
                 ArchiveStrategy = ArchiveStrategy.SingleArchive,
-                SingleArchiveName = "complete_backup.zip",
+                SingleArchiveName = "complete_backup.zip", // Output file will be "complete_backup.zip"
             };
 
             var progress = new Progress<ProgressInfo>(info =>
@@ -48,10 +48,10 @@ namespace ZipSplitter.Examples
         {
             var options = new SplitOptions
             {
-                ArchiveStrategy = ArchiveStrategy.SplitBySize,
+                ArchiveStrategy = ArchiveStrategy.SplitBySize, // Archives will be named e.g., archive001.zip, archive002.zip
                 MaxSizeBytes = 50 * 1024 * 1024, // 50MB
                 SizeLimitType = SizeLimitType.CompressedArchive, // Limit final ZIP size
-                LargeFileHandling = LargeFileHandling.CreateSeparateArchive,
+                LargeFileHandling = LargeFileHandling.CreateSeparateArchive, // Large files: large_file_originalfilename.zip
                 EstimatedCompressionRatio = 0.6, // Assume 40% compression
             };
 
@@ -92,9 +92,9 @@ namespace ZipSplitter.Examples
         {
             var options = new SplitOptions
             {
-                ArchiveStrategy = ArchiveStrategy.SplitBySize,
+                ArchiveStrategy = ArchiveStrategy.SplitBySize, // Archives will be named e.g., archive001.zip
                 MaxSizeBytes = 100 * 1024 * 1024, // 100MB
-                LargeFileHandling = LargeFileHandling.CopyUncompressed,
+                LargeFileHandling = LargeFileHandling.CopyUncompressed, // Large files are copied, not zipped.
                 SizeLimitType = SizeLimitType.UncompressedData,
             };
 
@@ -120,9 +120,9 @@ namespace ZipSplitter.Examples
         {
             var options = new SplitOptions
             {
-                ArchiveStrategy = ArchiveStrategy.SplitBySize,
+                ArchiveStrategy = ArchiveStrategy.SplitBySize, // Archives will be named e.g., archive001.zip
                 MaxSizeBytes = 10 * 1024 * 1024, // 10MB
-                LargeFileHandling = LargeFileHandling.SkipFile,
+                LargeFileHandling = LargeFileHandling.SkipFile, // Large files are skipped.
             };
 
             var result = await ZipSplitterWithProgress.CreateArchivesAsync(

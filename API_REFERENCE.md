@@ -41,7 +41,7 @@ Primary configuration class for archive operations.
 public class SplitOptions
 {
     public ArchiveStrategy ArchiveStrategy { get; set; } = ArchiveStrategy.SplitBySize;
-    public long MaxArchiveSize { get; set; } = 50 * 1024 * 1024; // 50MB
+    public long MaxSizeBytes { get; set; } = 50 * 1024 * 1024; // 50MB // Corrected from MaxArchiveSize
     public LargeFileHandling LargeFileHandling { get; set; } = LargeFileHandling.ThrowException;
     public SizeLimitType SizeLimitType { get; set; } = SizeLimitType.UncompressedData;
     public double EstimatedCompressionRatio { get; set; } = 0.7;
@@ -51,12 +51,14 @@ public class SplitOptions
 
 **Property Details:**
 
-- `ArchiveStrategy`: Determines whether to split by size or create a single archive
-- `MaxArchiveSize`: Maximum size limit (interpretation depends on SizeLimitType)
-- `LargeFileHandling`: How to handle files that exceed the size limit
-- `SizeLimitType`: Whether size limit applies to uncompressed data or final ZIP size
-- `EstimatedCompressionRatio`: Used for compressed size calculations (0.1-1.0)
-- `SingleArchiveName`: Name for single archive mode
+- `ArchiveStrategy`: Determines whether to split by size or create a single archive.
+  - If `SplitBySize` is used, archives are named `archive001.zip`, `archive002.zip`, etc., by default.
+- `MaxSizeBytes`: Maximum size limit (interpretation depends on `SizeLimitType`). // Corrected from MaxArchiveSize
+- `LargeFileHandling`: How to handle files that exceed the size limit.
+  - If `CreateSeparateArchive` is chosen, the separate archive will be named `large_file_{OriginalFileNameWithoutExtension}.zip`.
+- `SizeLimitType`: Defines what the size limit represents (uncompressed data or compressed archive).
+- `EstimatedCompressionRatio`: Used when `SizeLimitType` is `CompressedArchive`.
+- `SingleArchiveName`: Name of the archive when `ArchiveStrategy` is `SingleArchive` (e.g., "backup.zip"). Must end with ".zip".
 
 ### SplitResult
 
@@ -119,7 +121,7 @@ public enum SizeLimitType
 var options = new SplitOptions
 {
     ArchiveStrategy = ArchiveStrategy.SingleArchive,
-    SingleArchiveName = "backup.zip"
+    SingleArchiveName = "backup.zip" // This name will be used for the output archive.
 };
 
 var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -132,11 +134,15 @@ Console.WriteLine($"Created archive: {result.CreatedArchives[0]}");
 
 #### Creating Split Archives
 
+Archives will be named `archive001.zip`, `archive002.zip`, etc.
+If a file is larger than `MaxSizeBytes` and `LargeFileHandling.CreateSeparateArchive` is used,
+it will be placed in an archive named `large_file_{OriginalFileNameWithoutExtension}.zip`.
+
 ```csharp
 var options = new SplitOptions
 {
     ArchiveStrategy = ArchiveStrategy.SplitBySize,
-    MaxArchiveSize = 50 * 1024 * 1024, // 50MB
+    MaxSizeBytes = 50 * 1024 * 1024, // 50MB // Corrected from MaxArchiveSize
     LargeFileHandling = LargeFileHandling.CreateSeparateArchive
 };
 
@@ -162,7 +168,7 @@ var progress = new Progress<ProgressInfo>(info =>
 var options = new SplitOptions
 {
     ArchiveStrategy = ArchiveStrategy.SplitBySize,
-    MaxArchiveSize = 100 * 1024 * 1024
+    MaxSizeBytes = 100 * 1024 * 1024
 };
 
 var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -188,11 +194,14 @@ catch (OperationCanceledException)
 
 #### Compressed Size Limits
 
+Archives will be named `archive001.zip`, `archive002.zip`, etc.
+Large files (post-estimated compression) will be skipped if they exceed `MaxSizeBytes`.
+
 ```csharp
 var options = new SplitOptions
 {
     ArchiveStrategy = ArchiveStrategy.SplitBySize,
-    MaxArchiveSize = 25 * 1024 * 1024, // 25MB final ZIP size
+    MaxSizeBytes = 25 * 1024 * 1024, // 25MB final ZIP size // Corrected from MaxArchiveSize
     SizeLimitType = SizeLimitType.CompressedArchive,
     EstimatedCompressionRatio = 0.7, // Expect 30% compression
     LargeFileHandling = LargeFileHandling.SkipFile
@@ -305,7 +314,7 @@ try
     var options = new SplitOptions
     {
         ArchiveStrategy = ArchiveStrategy.SplitBySize,
-        MaxArchiveSize = 50 * 1024 * 1024,
+        MaxSizeBytes = 50 * 1024 * 1024,
         LargeFileHandling = LargeFileHandling.CreateSeparateArchive
     };
 
@@ -369,18 +378,18 @@ catch (Exception ex)
 // Conservative backup with strict size limits
 var backupOptions = new SplitOptions
 {
-    ArchiveStrategy = ArchiveStrategy.SplitBySize,
-    MaxArchiveSize = 25 * 1024 * 1024, // 25MB
+    ArchiveStrategy = ArchiveStrategy.SplitBySize, // Output: archive001.zip, ...
+    MaxSizeBytes = 25 * 1024 * 1024, // 25MB // Corrected from MaxArchiveSize
     SizeLimitType = SizeLimitType.CompressedArchive,
     EstimatedCompressionRatio = 0.8, // Conservative estimate
-    LargeFileHandling = LargeFileHandling.CreateSeparateArchive
+    LargeFileHandling = LargeFileHandling.CreateSeparateArchive // Output: large_file_X.zip
 };
 
 // Flexible archive creation
 var flexibleOptions = new SplitOptions
 {
-    ArchiveStrategy = ArchiveStrategy.SplitBySize,
-    MaxArchiveSize = 100 * 1024 * 1024, // 100MB uncompressed
+    ArchiveStrategy = ArchiveStrategy.SplitBySize, // Output: archive001.zip, ...
+    MaxSizeBytes = 100 * 1024 * 1024, // 100MB uncompressed // Corrected from MaxArchiveSize
     SizeLimitType = SizeLimitType.UncompressedData,
     LargeFileHandling = LargeFileHandling.SkipFile
 };

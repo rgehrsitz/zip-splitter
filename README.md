@@ -47,7 +47,7 @@ Comprehensive test suite including:
   - **Split by Size**: Traditional splitting into multiple archives
   - **Single Archive**: Create one archive regardless of size
 - ✅ **Large File Handling**: Multiple options for files exceeding size limits - **Throw Exception**: Strict size enforcement (default behavior)
-  - **Create Separate Archive**: Put large files in their own archives
+  - **Create Separate Archive**: Put large files in their own archives (named `large_file_{OriginalFileNameWithoutExtension}.zip`)
   - **Skip File**: Skip large files and report them
   - **Copy Uncompressed**: Copy large files without compression
 - ✅ **Size Limit Types**:
@@ -113,6 +113,9 @@ Parameters:
 
 #### Enhanced API (Recommended)
 
+When using `ArchiveStrategy.SplitBySize` without a custom naming implementation, archives will be named `archive001.zip`, `archive002.zip`, and so on.
+If `LargeFileHandling.CreateSeparateArchive` is used, individual large files will be named `large_file_{OriginalFileNameWithoutExtension}.zip`.
+
 ```csharp
 using ZipSplitter.Core;
 
@@ -120,7 +123,7 @@ using ZipSplitter.Core;
 var singleArchiveOptions = new SplitOptions
 {
     ArchiveStrategy = ArchiveStrategy.SingleArchive,
-    SingleArchiveName = "complete_backup.zip"
+    SingleArchiveName = "complete_backup.zip" // User-defined name for the single archive
 };
 
 var result = await ZipSplitterWithProgress.CreateArchivesAsync(
@@ -138,9 +141,9 @@ Console.WriteLine($"Duration: {result.Duration}");
 // Example 2: Split archives with flexible large file handling
 var splitOptions = new SplitOptions
 {
-    ArchiveStrategy = ArchiveStrategy.SplitBySize,
+    ArchiveStrategy = ArchiveStrategy.SplitBySize, // Results in archive001.zip, archive002.zip etc.
     MaxSizeBytes = 100 * 1024 * 1024, // 100MB
-    LargeFileHandling = LargeFileHandling.CreateSeparateArchive,
+    LargeFileHandling = LargeFileHandling.CreateSeparateArchive, // Large files become large_file_originalfilename.zip
     SizeLimitType = SizeLimitType.UncompressedData
 };
 
@@ -160,10 +163,10 @@ if (result.HasWarnings)
 // Example 3: Compressed size limits with skip option
 var compressedSizeOptions = new SplitOptions
 {
-    ArchiveStrategy = ArchiveStrategy.SplitBySize,
+    ArchiveStrategy = ArchiveStrategy.SplitBySize, // Results in archive001.zip, archive002.zip etc.
     MaxSizeBytes = 50 * 1024 * 1024, // 50MB compressed
     SizeLimitType = SizeLimitType.CompressedArchive,
-    LargeFileHandling = LargeFileHandling.SkipFile,
+    LargeFileHandling = LargeFileHandling.SkipFile, // Skips files larger than MaxSizeBytes (after estimated compression)
     EstimatedCompressionRatio = 0.8 // 20% compression expected
 };
 
