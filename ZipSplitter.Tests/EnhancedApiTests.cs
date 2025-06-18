@@ -135,8 +135,8 @@ namespace ZipSplitter.Tests
             using var cts = new CancellationTokenSource();
             cts.CancelAfter(1); // Cancel almost immediately
 
-            // Act & Assert - The implementation throws OperationCanceledException
-            await Assert.ThrowsAsync<TaskCanceledException>(() =>
+            // Act & Assert - Accept either OperationCanceledException or TaskCanceledException
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
                 ZipSplitterWithProgress.CreateArchivesAsync(
                     _testSourceDirectory,
                     _testOutputDirectory,
